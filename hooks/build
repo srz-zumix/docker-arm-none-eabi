@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eu
+
+ARCHI=x86_64-linux
+
+case $DOCKER_TAG in
+  "6-2016q4"  ) FILE="gcc-arm-none-eabi-6_2-2016q4-20161216"; ARCHI=linux ;;
+  "7-2017q4"  ) FILE="gcc-arm-none-eabi-7-2017-q4-major"; ARCHI=linux ;;
+  "8-2018q4"  ) FILE="gcc-arm-none-eabi-8-2018-q4-major"; ARCHI=linux ;;
+  "9-2019q4"  ) FILE="gcc-arm-none-eabi-9-2019-q4-major" ;;
+  "10-2020q4" ) FILE="gcc-arm-none-eabi-10-2020-q4-major" ;;
+  * ) exit 1 ;;
+esac
+
+
+docker build --build-arg DIR=${DOCKER_TAG} --build-arg FILE=${FILE} --build-arg ARCHI=${ARCHI} -f $DOCKERFILE_PATH -t $IMAGE_NAME .

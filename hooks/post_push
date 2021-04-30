@@ -1,0 +1,6 @@
+#!/bin/bash
+set -eu
+
+GCC_VERSION_=$(docker run -t --rm ${IMAGE_NAME} arm-none-eabi-gcc --version | grep "oneAPI DPC")
+GCC_VERSION=$(echo ${GCC_VERSION_} | cut -d " " -f5)
+GCC_VERSION_DETAIL=$(echo ${GCC_VERSION_} | cut -d " " -f6 | grep -E -o '[0-9.]+')

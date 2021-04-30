@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
 
+DIR=$DOCKER_TAG
 ARCHI=x86_64-linux
 
 case $DOCKER_TAG in
@@ -9,8 +10,9 @@ case $DOCKER_TAG in
   "8-2018q4"  ) FILE="gcc-arm-none-eabi-8-2018-q4-major"; ARCHI=linux ;;
   "9-2019q4"  ) FILE="gcc-arm-none-eabi-9-2019-q4-major" ;;
   "10-2020q4" ) FILE="gcc-arm-none-eabi-10-2020-q4-major" ;;
+  "latest" )    FILE="gcc-arm-none-eabi-10-2020-q4-major" DIR="10-2020q4" ;;
   * ) exit 1 ;;
 esac
 
 
-docker build --build-arg DIR=${DOCKER_TAG} --build-arg FILE=${FILE} --build-arg ARCHI=${ARCHI} -f $DOCKERFILE_PATH -t $IMAGE_NAME .
+docker build --build-arg DIR=${DIR} --build-arg FILE=${FILE} --build-arg ARCHI=${ARCHI} -f $DOCKERFILE_PATH -t $IMAGE_NAME .

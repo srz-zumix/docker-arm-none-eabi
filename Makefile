@@ -12,4 +12,4 @@ run: ## run image
 	docker run -it --rm ${IMAGE_NAME} bash 
 
 version: ## show gcc version
-	docker run -it --rm ${IMAGE_NAME} arm-none-eabi-gcc --version 
+	DOCKER_TAG=${DOCKER_TAG} IMAGE_NAME=${IMAGE_NAME} DOCKERFILE_PATH=${DOCKERFILE_PATH} ./hooks/post_push

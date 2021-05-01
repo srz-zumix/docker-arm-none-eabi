@@ -4,6 +4,7 @@ ARG UBUNTU_VERSION
 
 ARG DIR=8-2018q4
 ARG FILE=gcc-arm-none-eabi-8-2018-q4-major
+ARG OUTFILE=gcc-arm-none-eabi-8-2018-q4-major
 ARG ARCHI=x86_64-linux
 
 LABEL maintainer "srz_zumix <https://github.com/srz-zumix>"
@@ -28,6 +29,6 @@ RUN dpkg --add-architecture i386 && \
   tar -xf $FILE-$ARCHI.tar.bz2 -C /usr/local/bin/ && rm *.tar.bz2 && \
   apt-get clean
 
-ENV PATH $PATH:/usr/local/bin/$FILE/bin
+ENV PATH $PATH:/usr/local/bin/$OUTFILE/bin
 ENV CC   arm-none-eabi-gcc
 ENV CXX  arm-none-eabi-g++

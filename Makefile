@@ -16,6 +16,10 @@ version: ## show gcc version
 
 6:
 	DOCKER_TAG="6-2016q4" make -C . build
-
 6-run:
 	DOCKER_TAG="6-2016q4" make -C . run
+
+9:
+	DOCKER_TAG="9-2019q4" make -C . build
+9-run:
+	DOCKER_TAG="9-2019q4" make -C . run

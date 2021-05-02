@@ -24,11 +24,13 @@ RUN dpkg --add-architecture i386 && \
     && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* && \
-  mkdir -p /usr/local/bin/ && \
+  mkdir -p /usr/local/ && \
   wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/$DIR/$FILE-$ARCHI.tar.bz2 && \
-  tar -xf $FILE-$ARCHI.tar.bz2 -C /usr/local/bin/ && rm *.tar.bz2 && \
+  tar -xf $FILE-$ARCHI.tar.bz2 -C /usr/local/ && rm *.tar.bz2 && \
   apt-get clean
 
-ENV PATH $PATH:/usr/local/bin/$OUTFILE/bin
+ENV PATH $PATH:/usr/local/$OUTFILE/bin
 ENV CC   arm-none-eabi-gcc
 ENV CXX  arm-none-eabi-g++
+ENV LD   arm-none-eabi-ld
+ENV LD_LIBRARY_PATH /usr/local/$OUTFILE/lib:$LD_LIBRARY_PATH

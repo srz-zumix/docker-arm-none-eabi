@@ -30,7 +30,14 @@ RUN dpkg --add-architecture i386 && \
   apt-get clean
 
 ENV PATH $PATH:/usr/local/$OUTFILE/bin
-ENV CC   arm-none-eabi-gcc
-ENV CXX  arm-none-eabi-g++
-ENV LD   arm-none-eabi-ld
+ENV CC=arm-none-eabi-gcc \
+    CXX=arm-none-eabi-g++ \
+    CMAKE_C_COMPILER=arm-none-eabi-gcc \
+    CMAKE_CXX_COMPILER=arm-none-eabi-g++ \
+    STRIP=arm-none-eabi-strip \
+    RANLIB=arm-none-eabi-ranlib \
+    AS=arm-none-eabi-as \
+    AR=arm-none-eabi-ar \
+    LD=arm-none-eabi-ld \
+    FC=arm-none-eabi-gfortran
 ENV LD_LIBRARY_PATH /usr/local/$OUTFILE/lib:$LD_LIBRARY_PATH

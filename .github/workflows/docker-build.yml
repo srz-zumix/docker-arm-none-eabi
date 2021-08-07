@@ -52,12 +52,12 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          build-args:
-            - UBUNTU_VERSION: ${{ matrix.ubuntu-version }}
-            - ARCHI: ${{ steps.build_args.outputs.ARCHI }}
-            - DIR: ${{ steps.build_args.outputs.DIR }}
-            - FILE: ${{ steps.build_args.outputs.FILE }}
-            - OUTFILE: ${{ steps.build_args.outputs.OUTFILE }}
+          build-args: |
+            UBUNTU_VERSION=${{ matrix.ubuntu-version }}
+            ARCHI=${{ steps.build_args.outputs.ARCHI }}
+            DIR=${{ steps.build_args.outputs.DIR }}
+            FILE=${{ steps.build_args.outputs.FILE }}
+            OUTFILE=${{ steps.build_args.outputs.OUTFILE }}
           push: true
           tags: srzzumix/arm-none-eabi:${{ matrix.ubuntu-version }}
       - name: Push to version tag

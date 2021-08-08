@@ -1,0 +1,80 @@
+name: Docker Build
+on:
+  # push:
+  schedule:
+    - cron: "0 0 * * 4"
+
+jobs:
+  push_to_registries:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gcc-version:
+          - latest
+          - 10-2020q4
+          - 9-2019q4
+          - 8-2018q4
+          - 7-2017q4
+          - 6-2016q4
+        ubuntu-version:
+          - latest
+          - focal
+      fail-fast: false
+    env:
+      GCC_VERSION: ${{ matrix.gcc-version }}
+      UBUNTU_VERSION: ${{ matrix.ubuntu-version }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Create build args
+        id: build_args
+        run: |
+          ARCHI=x86_64-linux
+          DIR=$GCC_VERSION
+          case $GCC_VERSION in
+            "6-2016q4"  ) FILE="gcc-arm-none-eabi-6_2-2016q4-20161216"; OUTFILE="gcc-arm-none-eabi-6_2-2016q4" ARCHI=linux ;;
+            "7-2017q4"  ) FILE="gcc-arm-none-eabi-7-2017-q4-major"; ARCHI=linux ;;
+            "8-2018q4"  ) FILE="gcc-arm-none-eabi-8-2018-q4-major"; ARCHI=linux ;;
+            "9-2019q4"  ) FILE="gcc-arm-none-eabi-9-2019-q4-major" ;;
+            "10-2020q4" ) FILE="gcc-arm-none-eabi-10-2020-q4-major" ;;
+            "latest" )    FILE="gcc-arm-none-eabi-10-2020-q4-major" DIR="10-2020q4" ;;
+            * ) exit 1 ;;
+          esac
+          echo "##[set-output name=ARCHI;]$(echo ${ARCHI})"
+          echo "##[set-output name=DIR;]$(echo ${DIR})"
+          echo "##[set-output name=FILE;]$(echo ${FILE})"
+
+          if [ -z "${OUTFILE}" ]; then
+              OUTFILE=$FILE
+          fi
+          echo "##[set-output name=OUTFILE;]$(echo ${OUTFILE})"
+      - name: Create build args
+        id: create_tagname
+        run: |
+          if [ "$UBUNTU_VERSION" = "latest" ]; then
+            echo "##[set-output name=tagname;]$(echo ${GCC_VERSION})"
+          else
+            echo "##[set-output name=tagname;]$(echo ${UBUNTU_VERSION}-${GCC_VERSION})"
+          fi
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          build-args: |
+            UBUNTU_VERSION=${{ matrix.ubuntu-version }}
+            ARCHI=${{ steps.build_args.outputs.ARCHI }}
+            DIR=${{ steps.build_args.outputs.DIR }}
+            FILE=${{ steps.build_args.outputs.FILE }}
+            OUTFILE=${{ steps.build_args.outputs.OUTFILE }}
+          push: true
+          tags: srzzumix/arm-none-eabi:${{ steps.create_tagname.outputs.tagname }}
+      - name: Push to version tag
+        env:
+          IMAGE_NAME: srzzumix/arm-none-eabi:${{ steps.create_tagname.outputs.tagname }}
+          DOCKER_REPO: srzzumix/arm-none-eabi
+        run: |
+          ./hooks/post_push

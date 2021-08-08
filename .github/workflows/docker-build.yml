@@ -16,9 +16,13 @@ jobs:
           - 8-2018q4
           - 7-2017q4
           - 6-2016q4
+        ubuntu-version:
+          - latest
+          - focal
       fail-fast: false
     env:
-      DOCKER_TAG: ${{ matrix.gcc-version }}
+      GCC_VERSION: ${{ matrix.gcc-version }}
+      UBUNTU_VERSION: ${{ matrix.ubuntu-version }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -26,8 +30,8 @@ jobs:
         id: build_args
         run: |
           ARCHI=x86_64-linux
-          DIR=$DOCKER_TAG
-          case $DOCKER_TAG in
+          DIR=$GCC_VERSION
+          case $GCC_VERSION in
             "6-2016q4"  ) FILE="gcc-arm-none-eabi-6_2-2016q4-20161216"; OUTFILE="gcc-arm-none-eabi-6_2-2016q4" ARCHI=linux ;;
             "7-2017q4"  ) FILE="gcc-arm-none-eabi-7-2017-q4-major"; ARCHI=linux ;;
             "8-2018q4"  ) FILE="gcc-arm-none-eabi-8-2018-q4-major"; ARCHI=linux ;;
@@ -44,6 +48,14 @@ jobs:
               OUTFILE=$FILE
           fi
           echo "##[set-output name=OUTFILE;]$(echo ${OUTFILE})"
+      - name: Create build args
+        id: create_tagname
+        run: |
+          if [ "$UBUNTU_VERSION" = "latest" ]; then
+            echo "##[set-output name=tagname;]$(echo ${GCC_VERSION})"
+          else
+            echo "##[set-output name=tagname;]$(echo ${UBUNTU_VERSION}-${GCC_VERSION})"
+          fi
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -59,10 +71,10 @@ jobs:
             FILE=${{ steps.build_args.outputs.FILE }}
             OUTFILE=${{ steps.build_args.outputs.OUTFILE }}
           push: true
-          tags: srzzumix/arm-none-eabi:${{ matrix.ubuntu-version }}
+          tags: srzzumix/arm-none-eabi:${{ steps.create_tagname.outputs.tagname }}
       - name: Push to version tag
         env:
-          IMAGE_NAME: srzzumix/arm-none-eabi:${{ matrix.ubuntu-version }}
+          IMAGE_NAME: srzzumix/arm-none-eabi:${{ steps.create_tagname.outputs.tagname }}
           DOCKER_REPO: srzzumix/arm-none-eabi
         run: |
           ./hooks/post_push

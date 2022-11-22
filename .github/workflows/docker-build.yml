@@ -43,21 +43,21 @@ jobs:
             "latest" )       FILE="gcc-arm-none-eabi-10.3-2021.10" DIR="10.3-2021.10" ;;
             * ) exit 1 ;;
           esac
-          echo "##[set-output name=ARCHI;]$(echo ${ARCHI})"
-          echo "##[set-output name=DIR;]$(echo ${DIR})"
-          echo "##[set-output name=FILE;]$(echo ${FILE})"
-
+          echo "ARCHI=${ARCHI}" >> $GITHUB_OUTPUT
+          echo "DIR=${DIR}" >> $GITHUB_OUTPUT
+          echo "FILE=${FILE}" >> $GITHUB_OUTPUT
           if [ -z "${OUTFILE}" ]; then
               OUTFILE=$FILE
           fi
-          echo "##[set-output name=OUTFILE;]$(echo ${OUTFILE})"
+          echo "OUTFILE=${OUTFILE}" >> $GITHUB_OUTPUT
       - name: Create build args
         id: create_tagname
         run: |
           if [ "$UBUNTU_VERSION" = "latest" ]; then
+            echo "tagname=${GCC_VERSION}" >> $GITHUB_OUTPUT
             echo "##[set-output name=tagname;]$(echo ${GCC_VERSION})"
           else
-            echo "##[set-output name=tagname;]$(echo ${UBUNTU_VERSION}-${GCC_VERSION})"
+            echo "tagname=${UBUNTU_VERSION}-${GCC_VERSION}" >> $GITHUB_OUTPUT
           fi
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
